@@ -3,12 +3,18 @@
 namespace App\Services\EODETLService;
 
 use App\Services\EODETLService\DTO\CsvRowDTO;
+use App\Services\EODETLService\Repositories\BoardRepository;
+use App\Services\EODETLService\Repositories\SectorRepository;
+use App\Services\EODETLService\Repositories\SecurityTypeRepository;
 use App\Services\EODETLService\Repositories\TickerRepository;
 use Illuminate\Support\Facades\Log;
 
 final class EODETLService
 {
     private TickerRepository $tickerRepository;
+    private BoardRepository $boardRepository;
+    private SectorRepository $sectorRepository;
+    private SecurityTypeRepository $securityTypeRepository;
     private CsvDownloader $csvDownloader;
     private CsvExtractor $csvExtractor;
     private string $externalFilepath;
@@ -17,11 +23,18 @@ final class EODETLService
 
     public function __construct(
         TickerRepository $tickerRepository,
+        BoardRepository $boardRepository,
+        SectorRepository $sectorRepository,
+        SecurityTypeRepository $securityTypeRepository,
         CsvDownloader $csvDownloader,
         CsvExtractor $csvExtractor,
         \DateTime $dateTime
     ) {
         $this->tickerRepository = $tickerRepository;
+        $this->boardRepository = $boardRepository;
+        $this->sectorRepository = $sectorRepository;
+        $this->securityTypeRepository = $securityTypeRepository;
+
         $this->csvDownloader = $csvDownloader;
         $this->csvExtractor = $csvExtractor;
 
@@ -43,6 +56,10 @@ final class EODETLService
                         continue;
                     }
 
+                    $tinker = $this->tickerRepository->getModel($rowDTO)->id;
+                    $board = $this->boardRepository->getModel($rowDTO)->id;
+                    $sector = $this->sectorRepository->getModel($rowDTO)->id;
+                    $securityType = $this->securityTypeRepository->getModel($rowDTO)->id;
                 }
             }
         } catch (\Throwable $exception) {

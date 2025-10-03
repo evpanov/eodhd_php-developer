@@ -4,9 +4,9 @@ namespace App\Services\EODETLService\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-final class Board extends Model
+final class EODData extends Model
 {
-    public const TABLE = 'boards';
+    public const TABLE = 'eod_data';
     public const FIELD_BOARD = 'board';
 
     protected $table = self::TABLE;
