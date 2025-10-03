@@ -14,7 +14,7 @@ class CreateTickersTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('tickers', static function (Blueprint $table) {
+        Schema::create(Ticker::TABLE, static function (Blueprint $table) {
             $table->increments('id');
             $table->string(Ticker::FIELD_STOCK_CODE);
             $table->string(Ticker::FIELD_STOCK_NAME);

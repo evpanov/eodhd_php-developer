@@ -14,14 +14,14 @@ class CreateEodDataTable extends Migration
      */
     public function up()
     {
-        Schema::create('eod_data', function (Blueprint $table) {
+        Schema::create(EODData::TABLE, function (Blueprint $table) {
             $table->increments('id');
             $table->date(EODData::FIELD_TRADE_DATE);
             $table->unsignedInteger(EODData::FIELD_TICKER_ID);
             $table->unsignedInteger(EODData::FIELD_BOARD_ID);
             $table->unsignedInteger(EODData::FIELD_SECTOR_ID);
             $table->unsignedInteger(EODData::FIELD_SECURITY_TYPE_ID);
-            $table->string(EODData::FIELD_CURRENCY, 3);
+            $table->unsignedSmallInteger(EODData::FIELD_CURRENCY_CODE_NUMERIC);
             $table->double(EODData::FIELD_OPENING_PRICE);
             $table->double(EODData::FIELD_HIGH_PRICE);
             $table->double(EODData::FIELD_LOWEST_PRICE);

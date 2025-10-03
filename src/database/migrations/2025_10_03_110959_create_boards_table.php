@@ -14,7 +14,7 @@ class CreateBoardsTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('boards', static function (Blueprint $table) {
+        Schema::create(Board::TABLE, static function (Blueprint $table) {
             $table->increments('id');
             $table->string(Board::FIELD_BOARD);
             $table->timestamps();

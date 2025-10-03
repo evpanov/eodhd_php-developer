@@ -32,6 +32,7 @@ final class CsvRowDTO
     public ?string $market_cap = null;
     public ?string $klci_indicator = null;
     public ?string $fbm100_indicator = null;
+    public ?int $eod_data_id = null;
 
     public function __construct(array $data = [])
     {
@@ -83,6 +84,12 @@ final class CsvRowDTO
     public function setCurrencyCodeNumeric(?int $currency_code_numeric): CsvRowDTO
     {
         $this->currency_code_numeric = $currency_code_numeric;
+        return $this;
+    }
+
+    public function setEodDataId(?int $eod_data_id): CsvRowDTO
+    {
+        $this->eod_data_id = $eod_data_id;
         return $this;
     }
 }

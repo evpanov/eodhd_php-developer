@@ -14,7 +14,7 @@ class CreateSecurityTypesTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('security_types', static function (Blueprint $table) {
+        Schema::create(SecurityType::TABLE, static function (Blueprint $table) {
             $table->increments('id');
             $table->string(SecurityType::FIELD_SECURITY_TYPE);
             $table->timestamps();

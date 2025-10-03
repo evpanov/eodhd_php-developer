@@ -6,6 +6,7 @@ use Alcohol\ISO4217;
 use App\Services\EODETLService\DTO\CsvRowDTO;
 use App\Services\EODETLService\Repositories\BoardRepository;
 use App\Services\EODETLService\Repositories\EODDataRepository;
+use App\Services\EODETLService\Repositories\FundamentalRepository;
 use App\Services\EODETLService\Repositories\SectorRepository;
 use App\Services\EODETLService\Repositories\SecurityTypeRepository;
 use App\Services\EODETLService\Repositories\TickerRepository;
@@ -18,6 +19,7 @@ final class EODETLService
     private SectorRepository $sectorRepository;
     private SecurityTypeRepository $securityTypeRepository;
     private EODDataRepository $EODDataRepository;
+    private FundamentalRepository $fundamentalRepository;
     private CsvDownloader $csvDownloader;
     private CsvExtractor $csvExtractor;
     private string $externalFilepath;
@@ -30,6 +32,7 @@ final class EODETLService
         SectorRepository $sectorRepository,
         SecurityTypeRepository $securityTypeRepository,
         EODDataRepository $EODDataRepository,
+        FundamentalRepository $fundamentalRepository,
         CsvDownloader $csvDownloader,
         CsvExtractor $csvExtractor,
         \DateTime $dateTime
@@ -39,6 +42,7 @@ final class EODETLService
         $this->sectorRepository = $sectorRepository;
         $this->securityTypeRepository = $securityTypeRepository;
         $this->EODDataRepository = $EODDataRepository;
+        $this->fundamentalRepository = $fundamentalRepository;
 
         $this->csvDownloader = $csvDownloader;
         $this->csvExtractor = $csvExtractor;
@@ -69,7 +73,10 @@ final class EODETLService
                     $iso4217 = new ISO4217();
                     $rowDTO->setCurrencyCodeNumeric($iso4217->getByAlpha3(strtoupper($rowDTO->currency))['numeric']);
 
-                    $this->EODDataRepository->create($rowDTO);
+                    $EODData = $this->EODDataRepository->create($rowDTO);
+
+                    $rowDTO->setEodDataId($EODData->id);
+                    $this->fundamentalRepository->create($rowDTO);
                 }
             }
         } catch (\Throwable $exception) {
