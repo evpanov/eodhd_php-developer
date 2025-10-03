@@ -2,8 +2,10 @@
 
 namespace App\Services\EODETLService;
 
+use Alcohol\ISO4217;
 use App\Services\EODETLService\DTO\CsvRowDTO;
 use App\Services\EODETLService\Repositories\BoardRepository;
+use App\Services\EODETLService\Repositories\EODDataRepository;
 use App\Services\EODETLService\Repositories\SectorRepository;
 use App\Services\EODETLService\Repositories\SecurityTypeRepository;
 use App\Services\EODETLService\Repositories\TickerRepository;
@@ -15,6 +17,7 @@ final class EODETLService
     private BoardRepository $boardRepository;
     private SectorRepository $sectorRepository;
     private SecurityTypeRepository $securityTypeRepository;
+    private EODDataRepository $EODDataRepository;
     private CsvDownloader $csvDownloader;
     private CsvExtractor $csvExtractor;
     private string $externalFilepath;
@@ -26,6 +29,7 @@ final class EODETLService
         BoardRepository $boardRepository,
         SectorRepository $sectorRepository,
         SecurityTypeRepository $securityTypeRepository,
+        EODDataRepository $EODDataRepository,
         CsvDownloader $csvDownloader,
         CsvExtractor $csvExtractor,
         \DateTime $dateTime
@@ -34,6 +38,7 @@ final class EODETLService
         $this->boardRepository = $boardRepository;
         $this->sectorRepository = $sectorRepository;
         $this->securityTypeRepository = $securityTypeRepository;
+        $this->EODDataRepository = $EODDataRepository;
 
         $this->csvDownloader = $csvDownloader;
         $this->csvExtractor = $csvExtractor;
@@ -56,10 +61,15 @@ final class EODETLService
                         continue;
                     }
 
-                    $tinker = $this->tickerRepository->getModel($rowDTO)->id;
-                    $board = $this->boardRepository->getModel($rowDTO)->id;
-                    $sector = $this->sectorRepository->getModel($rowDTO)->id;
-                    $securityType = $this->securityTypeRepository->getModel($rowDTO)->id;
+                    $rowDTO->setTickerId($this->tickerRepository->getModel($rowDTO)->id);
+                    $rowDTO->setBoardId($this->boardRepository->getModel($rowDTO)->id);
+                    $rowDTO->setSectorId($this->sectorRepository->getModel($rowDTO)->id);
+                    $rowDTO->setSecurityTypeId($this->securityTypeRepository->getModel($rowDTO)->id);
+
+                    $iso4217 = new ISO4217();
+                    $rowDTO->setCurrencyCodeNumeric($iso4217->getByAlpha3(strtoupper($rowDTO->currency))['numeric']);
+
+                    $this->EODDataRepository->create($rowDTO);
                 }
             }
         } catch (\Throwable $exception) {
