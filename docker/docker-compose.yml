@@ -1,0 +1,66 @@
+services:
+  launchpad:
+    container_name: ${COMPOSE_PROJECT_NAME}--launchpad
+    hostname: ${COMPOSE_PROJECT_NAME}--launchpad
+    build:
+      context: ./images/launchpad
+    volumes:
+      - ../src:/opt/app:rw
+      - ./images/launchpad/config/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    depends_on:
+      - mysql
+      - redis
+    restart: ${RESTART_FLAG}
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY_LIMIT}
+        reservations:
+          memory: ${MEMORY_RESERVATION}
+  php_cli:
+    container_name: ${COMPOSE_PROJECT_NAME}--php-cli
+    hostname: ${COMPOSE_PROJECT_NAME}--php-cli
+    build:
+      context: ./images/php_cli
+    volumes:
+      - ../src:/opt/app:rw
+      - ./images/php_cli/config/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    depends_on:
+      - mysql
+      - redis
+    restart: ${RESTART_FLAG}
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY_LIMIT}
+        reservations:
+          memory: ${MEMORY_RESERVATION}
+  redis:
+    container_name: ${COMPOSE_PROJECT_NAME}--redis
+    hostname: ${COMPOSE_PROJECT_NAME}--redis
+    image: redis:8.2
+    restart: ${RESTART_FLAG}
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY_LIMIT}
+        reservations:
+          memory: ${MEMORY_RESERVATION}
+  mysql:
+    container_name: ${COMPOSE_PROJECT_NAME}--mysql
+    hostname: ${COMPOSE_PROJECT_NAME}--mysql
+    image: mysql:8.4.6
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    restart: ${RESTART_FLAG}
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY_LIMIT}
+        reservations:
+          memory: ${MEMORY_RESERVATION}
